@@ -11,27 +11,26 @@ namespace PCTImageAcquisition
 	{
 		public const int NumDetectorModules = 5;
 		public const int PixelBytes = 3;
-		public static bool BigEndian = true;
-		public static int FrameHeader = 5;
-		public static int FrameTrailer = 105;
 		public const int ImageCol = 24;
 		public const int ImageRow = 16;
 
-		private const string SettingfilePath = "./capture_settings.ini";
+		public static bool BigEndian = true;
+		public static int FrameHeader = 5;
+		public static int FrameTrailer = 105;
 
 		[DllImport("kernel32")]
 		private static extern int GetPrivateProfileInt(string section, string key, int def, string filePath);
 		static Raw2Image()
 		{
-			if (File.Exists(SettingfilePath))
+			if (File.Exists(Resources.settingfilePath))
 			{
-				int result = GetPrivateProfileInt("Raw data format", "header length", 0, SettingfilePath);
+				int result = GetPrivateProfileInt("RawFormat", "header length", 0, Resources.settingfilePath);
 				if (result > 0)
 					FrameHeader = result;
-				result = GetPrivateProfileInt("Raw data format", "trailer length", 0, SettingfilePath);
+				result = GetPrivateProfileInt("RawFormat", "trailer length", 0, Resources.settingfilePath);
 				if (result > 0)
 					FrameTrailer = result;
-				result = GetPrivateProfileInt("Raw data format", "big endian", 1, SettingfilePath);
+				result = GetPrivateProfileInt("RawFormat", "big endian", 1, Resources.settingfilePath);
 				BigEndian = (result == 1);
 			}
 		}

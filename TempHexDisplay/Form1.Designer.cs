@@ -1,4 +1,4 @@
-﻿namespace TempHexDisplay
+﻿namespace XPCTViewer
 {
 	partial class Form1
 	{
@@ -29,8 +29,8 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.displayBox = new System.Windows.Forms.PictureBox();
-			this.openK12Btn = new System.Windows.Forms.Button();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+			this.picBox = new System.Windows.Forms.PictureBox();
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.exitBtn = new System.Windows.Forms.Button();
 			this.datapropGrp = new System.Windows.Forms.GroupBox();
@@ -39,7 +39,7 @@
 			this.maxLbl = new System.Windows.Forms.Label();
 			this.nGroupsLbl = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.autoUpdateIntevalBox = new System.Windows.Forms.TextBox();
+			this.updateIntevalBox = new System.Windows.Forms.TextBox();
 			this.magBar = new System.Windows.Forms.TrackBar();
 			this.label1 = new System.Windows.Forms.Label();
 			this.dispGrp = new System.Windows.Forms.GroupBox();
@@ -51,8 +51,8 @@
 			this.isGrayscaling = new System.Windows.Forms.CheckBox();
 			this.magDisp = new System.Windows.Forms.Label();
 			this.frameScrl = new System.Windows.Forms.HScrollBar();
-			this.autoUpdateTimer = new System.Windows.Forms.Timer(this.components);
-			this.netAcqBtn = new System.Windows.Forms.CheckBox();
+			this.updateTimer = new System.Windows.Forms.Timer(this.components);
+			this.netCaptureBtn = new System.Windows.Forms.CheckBox();
 			this.pseudoDataBtn = new System.Windows.Forms.CheckBox();
 			this.saveasBtn = new System.Windows.Forms.Button();
 			this.openfileBtn = new System.Windows.Forms.Button();
@@ -63,8 +63,7 @@
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.status1 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.status2 = new System.Windows.Forms.ToolStripStatusLabel();
-			((System.ComponentModel.ISupportInitialize)(this.displayBox)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.picBox)).BeginInit();
 			this.datapropGrp.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.magBar)).BeginInit();
 			this.dispGrp.SuspendLayout();
@@ -72,26 +71,16 @@
 			this.statusStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// displayBox
+			// picBox
 			// 
-			this.displayBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.displayBox.Location = new System.Drawing.Point(12, 12);
-			this.displayBox.Name = "displayBox";
-			this.displayBox.Size = new System.Drawing.Size(962, 130);
-			this.displayBox.TabIndex = 0;
-			this.displayBox.TabStop = false;
-			this.displayBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
-			this.displayBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.displayBox_MouseMove);
-			// 
-			// openK12Btn
-			// 
-			this.openK12Btn.Location = new System.Drawing.Point(12, 364);
-			this.openK12Btn.Name = "openK12Btn";
-			this.openK12Btn.Size = new System.Drawing.Size(126, 65);
-			this.openK12Btn.TabIndex = 3;
-			this.openK12Btn.Text = "打开K12文件";
-			this.openK12Btn.UseVisualStyleBackColor = true;
-			this.openK12Btn.Click += new System.EventHandler(this.openK12Btn_Click);
+			this.picBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picBox.Location = new System.Drawing.Point(12, 12);
+			this.picBox.Name = "picBox";
+			this.picBox.Size = new System.Drawing.Size(962, 130);
+			this.picBox.TabIndex = 0;
+			this.picBox.TabStop = false;
+			this.picBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
+			this.picBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.displayBox_MouseMove);
 			// 
 			// openFileDialog1
 			// 
@@ -165,13 +154,13 @@
 			this.label2.TabIndex = 16;
 			this.label2.Text = "刷新间隔(ms)";
 			// 
-			// autoUpdateIntevalBox
+			// updateIntevalBox
 			// 
-			this.autoUpdateIntevalBox.Location = new System.Drawing.Point(91, 20);
-			this.autoUpdateIntevalBox.Name = "autoUpdateIntevalBox";
-			this.autoUpdateIntevalBox.Size = new System.Drawing.Size(46, 21);
-			this.autoUpdateIntevalBox.TabIndex = 15;
-			this.autoUpdateIntevalBox.Text = "100";
+			this.updateIntevalBox.Location = new System.Drawing.Point(91, 20);
+			this.updateIntevalBox.Name = "updateIntevalBox";
+			this.updateIntevalBox.Size = new System.Drawing.Size(46, 21);
+			this.updateIntevalBox.TabIndex = 15;
+			this.updateIntevalBox.Text = "100";
 			// 
 			// magBar
 			// 
@@ -289,22 +278,21 @@
 			this.frameScrl.TabIndex = 19;
 			this.frameScrl.Scroll += new System.Windows.Forms.ScrollEventHandler(this.frameScrl_Scroll);
 			// 
-			// autoUpdateTimer
+			// updateTimer
 			// 
-			this.autoUpdateTimer.Interval = 50;
-			this.autoUpdateTimer.Tick += new System.EventHandler(this.captureTimer_Tick);
+			this.updateTimer.Tick += new System.EventHandler(this.updateTimer_Tick);
 			// 
-			// netAcqBtn
+			// netCaptureBtn
 			// 
-			this.netAcqBtn.Appearance = System.Windows.Forms.Appearance.Button;
-			this.netAcqBtn.Location = new System.Drawing.Point(144, 364);
-			this.netAcqBtn.Name = "netAcqBtn";
-			this.netAcqBtn.Size = new System.Drawing.Size(126, 65);
-			this.netAcqBtn.TabIndex = 22;
-			this.netAcqBtn.Text = "开始网络采集";
-			this.netAcqBtn.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			this.netAcqBtn.UseVisualStyleBackColor = true;
-			this.netAcqBtn.CheckedChanged += new System.EventHandler(this.netAcqBtn_CheckedChanged);
+			this.netCaptureBtn.Appearance = System.Windows.Forms.Appearance.Button;
+			this.netCaptureBtn.Location = new System.Drawing.Point(368, 364);
+			this.netCaptureBtn.Name = "netCaptureBtn";
+			this.netCaptureBtn.Size = new System.Drawing.Size(126, 65);
+			this.netCaptureBtn.TabIndex = 22;
+			this.netCaptureBtn.Text = "开始网络采集";
+			this.netCaptureBtn.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.netCaptureBtn.UseVisualStyleBackColor = true;
+			this.netCaptureBtn.CheckedChanged += new System.EventHandler(this.netCaptureBtn_CheckedChanged);
 			// 
 			// pseudoDataBtn
 			// 
@@ -321,7 +309,7 @@
 			// 
 			// saveasBtn
 			// 
-			this.saveasBtn.Location = new System.Drawing.Point(276, 364);
+			this.saveasBtn.Location = new System.Drawing.Point(144, 364);
 			this.saveasBtn.Name = "saveasBtn";
 			this.saveasBtn.Size = new System.Drawing.Size(126, 65);
 			this.saveasBtn.TabIndex = 24;
@@ -331,7 +319,7 @@
 			// 
 			// openfileBtn
 			// 
-			this.openfileBtn.Location = new System.Drawing.Point(408, 364);
+			this.openfileBtn.Location = new System.Drawing.Point(12, 364);
 			this.openfileBtn.Name = "openfileBtn";
 			this.openfileBtn.Size = new System.Drawing.Size(126, 65);
 			this.openfileBtn.TabIndex = 25;
@@ -343,7 +331,7 @@
 			this.acqGrp.Controls.Add(this.accumNumBox);
 			this.acqGrp.Controls.Add(this.autosaveBtn);
 			this.acqGrp.Controls.Add(this.label3);
-			this.acqGrp.Controls.Add(this.autoUpdateIntevalBox);
+			this.acqGrp.Controls.Add(this.updateIntevalBox);
 			this.acqGrp.Controls.Add(this.label2);
 			this.acqGrp.Location = new System.Drawing.Point(368, 195);
 			this.acqGrp.Name = "acqGrp";
@@ -387,8 +375,7 @@
 			// statusStrip
 			// 
 			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.status1,
-            this.status2});
+            this.status1});
 			this.statusStrip.Location = new System.Drawing.Point(0, 437);
 			this.statusStrip.Name = "statusStrip";
 			this.statusStrip.Size = new System.Drawing.Size(987, 22);
@@ -402,13 +389,6 @@
 			this.status1.Size = new System.Drawing.Size(200, 17);
 			this.status1.Text = "状态1";
 			// 
-			// status2
-			// 
-			this.status2.AutoSize = false;
-			this.status2.Name = "status2";
-			this.status2.Size = new System.Drawing.Size(200, 17);
-			this.status2.Text = "状态2";
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -419,17 +399,17 @@
 			this.Controls.Add(this.openfileBtn);
 			this.Controls.Add(this.saveasBtn);
 			this.Controls.Add(this.pseudoDataBtn);
-			this.Controls.Add(this.netAcqBtn);
+			this.Controls.Add(this.netCaptureBtn);
 			this.Controls.Add(this.frameScrl);
 			this.Controls.Add(this.dispGrp);
 			this.Controls.Add(this.datapropGrp);
 			this.Controls.Add(this.exitBtn);
-			this.Controls.Add(this.openK12Btn);
-			this.Controls.Add(this.displayBox);
+			this.Controls.Add(this.picBox);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "Form1";
 			this.Text = "Form1";
 			this.Load += new System.EventHandler(this.Form1_Load);
-			((System.ComponentModel.ISupportInitialize)(this.displayBox)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.picBox)).EndInit();
 			this.datapropGrp.ResumeLayout(false);
 			this.datapropGrp.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.magBar)).EndInit();
@@ -446,8 +426,7 @@
 
 		#endregion
 
-		private System.Windows.Forms.PictureBox displayBox;
-		private System.Windows.Forms.Button openK12Btn;
+		private System.Windows.Forms.PictureBox picBox;
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 		private System.Windows.Forms.Button exitBtn;
 		private System.Windows.Forms.GroupBox datapropGrp;
@@ -459,13 +438,13 @@
 		private System.Windows.Forms.HScrollBar frameScrl;
 		private System.Windows.Forms.Label nGroupsLbl;
 		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.TextBox autoUpdateIntevalBox;
+		private System.Windows.Forms.TextBox updateIntevalBox;
 		private System.Windows.Forms.Label pixelDataLbl;
 		private System.Windows.Forms.CheckBox showSplitline;
 		private System.Windows.Forms.Label minLbl;
 		private System.Windows.Forms.Label maxLbl;
-		private System.Windows.Forms.Timer autoUpdateTimer;
-		private System.Windows.Forms.CheckBox netAcqBtn;
+		private System.Windows.Forms.Timer updateTimer;
+		private System.Windows.Forms.CheckBox netCaptureBtn;
 		private System.Windows.Forms.CheckBox pseudoDataBtn;
 		private System.Windows.Forms.Button saveasBtn;
 		private System.Windows.Forms.Button openfileBtn;
@@ -480,7 +459,6 @@
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.StatusStrip statusStrip;
 		private System.Windows.Forms.ToolStripStatusLabel status1;
-		private System.Windows.Forms.ToolStripStatusLabel status2;
 	}
 }
 

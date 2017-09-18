@@ -1,70 +1,65 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+
 
 namespace PCTImageAcquisition
 {
 	public static class CaptureUtility
 	{
-		public static int __numInvalidFrames;		//only for debug
+		public static int __numInvalidFrames;   //only for debug
 
-		private static NetAcquisition capture;
-		private static bool[] moduleOK;
-		private static int[] fullImage;
-		private static int[] data;
-		private static readonly int imageLength;
-		private static volatile bool requestStop;
+		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
+		private static NetAcquisition capturer;
+		private static volatile DataManager dataManager;
+		private static readonly int[] blackImage;
 
 		static CaptureUtility()
 		{
-			if (capture == null)
-				capture = new NetAcquisition();
-			moduleOK = new bool[5];
-			imageLength = Raw2Image.ImageCol*Raw2Image.ImageRow;
-			fullImage =new int[imageLength * 5];
+			blackImage = new int[ImageLength];
 		}
-		public static int[] CaptureOneFullview(int timeout=100)
+		public static int[] PeekMostRecentImage(int modId)
 		{
-			if (capture.IsRunning)
-				return fullImage;
-			requestStop = false;
-			__numInvalidFrames = 0;
-			Array.Clear(moduleOK, 0, 5);
-
-			Stopwatch sw=new Stopwatch();
-			sw.Start();
-			capture.StartAcquisitionAsync(cbFillBuffer);
-			while (!requestStop)
+			if (capturer == null)
+				return blackImage;
+			int pos = dataManager.Length == 0 ? 0 : dataManager.Length - 1;
+			while (true)
 			{
-				if (Array.TrueForAll(moduleOK, i => i))
+				if (dataManager.ModID[pos] == modId)
 					break;
-				if (sw.ElapsedMilliseconds > timeout)
+				pos--;
+				if (pos < 0)
+					pos = dataManager.FrameCapacity - 1;
+				if (dataManager.Length - 1 == pos)  //not found over a round search
 				{
-					__numInvalidFrames = -1;
-					break;
+					return blackImage;
 				}
 			}
-			sw.Reset();
-			capture.StopAcquistion();
-			requestStop = false;
-			
-			return fullImage;
+			int[] im = new int[ImageLength];
+			Array.Copy(dataManager.Data, pos * ImageLength, im, 0, ImageLength);
+			return im;
 		}
 
 		public static void StopCapture()
 		{
-			if (!capture.IsRunning)
+			if (capturer == null)
+				capturer = new NetAcquisition();
+			if (!capturer.IsRunning)
 				return;
-			capture.StopAcquistion();
-			requestStop = true;
+			capturer.StopAcquistion();
 		}
 
-		private static void cbFillBuffer(byte[] rawData)
+		public static bool CaptureAndStore(DataManager dataMan)
+		{
+			if (capturer == null)
+				capturer = new NetAcquisition();
+			if (capturer.IsRunning)
+				return false;
+			dataManager = dataMan;
+			capturer.StartAcquisitionAsync(cbFillDataManager);
+
+			return true;
+		}
+
+		private static void cbFillDataManager(byte[] rawData)
 		{
 			if (!Raw2Image.IsValidFrame(rawData))
 			{
@@ -72,32 +67,9 @@ namespace PCTImageAcquisition
 				return;
 			}
 			int modId;
-			int[] modBytes = Raw2Image.ExtractImageData(rawData, out modId);
-			modId--; //modId must be 0-based
+			int[] imageInts = Raw2Image.ExtractImageData(rawData, out modId);
 
-			for (int row = 0; row < Raw2Image.ImageRow; row++)
-				Array.Copy(modBytes, row*Raw2Image.ImageCol, fullImage, (row*5 + modId)*Raw2Image.ImageCol, Raw2Image.ImageCol);
-			moduleOK[modId] = true;
+			dataManager.Add(modId, imageInts);
 		}
-
-		public static bool CaptureAndStore(int timeout=50)
-		{
-			throw new NotImplementedException();
-			if (capture.IsRunning)
-				return false;
-			requestStop = false;
-			Array.Clear(moduleOK, 0, 5);
-			capture.StartAcquisitionAsync(cbFillBuffer);
-			while (!requestStop)
-			{
-				if (Array.TrueForAll(moduleOK, i => i))
-					break;
-			}
-			capture.StopAcquistion();
-			requestStop = false;
-
-			return true;
-		}
-
 	}
 }

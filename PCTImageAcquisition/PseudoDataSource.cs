@@ -11,60 +11,52 @@ using System.Threading.Tasks;
 
 namespace PCTImageAcquisition
 {
-	public class PseudoDataSource:IDisposable
+	public class PseudoDataSource : IDisposable
 	{
-		public const int NumDetectorModules = 5;
-		public int PixelBytes = 3;
 		public int FrameHeader = 5;
 		public int FrameTrailer = 105;
-		public const int ImageCol = 24;
-		public const int ImageRow = 16;
 		public bool IsRunning;
+		public string TargetIP = "127.0.0.1";
+		public int TargetPort = 8080;
+		public int SendingPort = 80;
 
-		private string targetIP = "127.0.0.1";
-		private int sendingPort = 80;
-		private int targetPort = 8080;
 		private IPEndPoint targetEndPoint;
 		private UdpClient local;
-		public volatile bool requestStopCapture;
-		private const string SettingfilePath = "./capture_settings.ini";
-
-		private Random rm=new Random();
+		private volatile bool requestStopCapture;
+		private Random rm = new Random();
+		private const int ImageLength = Raw2Image.ImageCol*Raw2Image.ImageRow;
 
 		[DllImport("kernel32")]
 		private static extern int GetPrivateProfileInt(string section, string key, int def, string filePath);
 		public PseudoDataSource()
 		{
-			if (File.Exists(SettingfilePath))
+			if (File.Exists(Resources.settingfilePath))
 			{
-				int result = GetPrivateProfileInt("Raw data format", "pixel bytes", 0, SettingfilePath);
-				if (result > 0)
-					PixelBytes = result;
-				result = GetPrivateProfileInt("Raw data format", "header length", 0, SettingfilePath);
+				int result = GetPrivateProfileInt("RawFormat", "header length", 0, Resources.settingfilePath);
 				if (result > 0)
 					FrameHeader = result;
-				result = GetPrivateProfileInt("Raw data format", "trailer length", 0, SettingfilePath);
+				result = GetPrivateProfileInt("RawFormat", "trailer length", 0, Resources.settingfilePath);
 				if (result > 0)
 					FrameTrailer = result;
-				int port = GetPrivateProfileInt("Network", "detector port", 0, SettingfilePath);
+				int port = GetPrivateProfileInt("Network", "detector port", 0, Resources.settingfilePath);
 				if (port > 0)
-					sendingPort = port;
-				port = GetPrivateProfileInt("Network", "capturer port", 0, SettingfilePath);
+					SendingPort = port;
+				port = GetPrivateProfileInt("Network", "capturer port", 0, Resources.settingfilePath);
 				if (port > 0)
-					targetPort = port;
+					TargetPort = port;
 			}
-			targetEndPoint=new IPEndPoint(IPAddress.Parse(targetIP), targetPort);
 		}
 
 		public void StartSendDataAsync()
 		{
 			if (local == null)
 			{
-				local = new UdpClient(sendingPort);
+				targetEndPoint = new IPEndPoint(IPAddress.Parse(TargetIP), TargetPort);
+				local = new UdpClient(SendingPort);
 			}
 			if (IsRunning)
 				return;
-			Task t=new Task(senderThread);
+			Task t = new Task(senderThread);
 			t.Start();
 		}
 
@@ -82,10 +74,10 @@ namespace PCTImageAcquisition
 			while (!requestStopCapture)
 			{
 				byte[] datagm = PseudoFrameGenerator(counter++);
-				if (counter > NumDetectorModules)
+				if (counter > Raw2Image.NumDetectorModules)
 					counter = 1;
 				local.Send(datagm, datagm.Length, targetEndPoint);
-//				Thread.Sleep(200);
+//								Thread.Sleep(20);
 			}
 			requestStopCapture = false;
 			IsRunning = false;
@@ -93,14 +85,14 @@ namespace PCTImageAcquisition
 
 		private byte[] PseudoFrameGenerator(int modId)
 		{
-			byte[] data = new byte[ImageCol*ImageRow*PixelBytes+FrameHeader+FrameTrailer];
+			byte[] data = new byte[ImageLength * Raw2Image.PixelBytes + FrameHeader + FrameTrailer];
 
-			data[0] = (byte)(0xf8*(rm.Next(10)>0?1:0));	//set chance to send Invalid data
+			data[0] = (byte)(0xf8 * (rm.Next(10) > 0 ? 1 : 0)); //set chance to send Invalid data
 			data[1] = (byte)modId;
 
-			for (int i = 0; i < ImageCol*ImageRow; i++)
+			for (int i = 0; i < ImageLength; i++)
 			{
-				int p = FrameHeader + i*PixelBytes;
+				int p = FrameHeader + i * Raw2Image.PixelBytes;
 				data[p] = 0;
 				data[p + 1] = (byte)rm.Next(255);
 				data[p + 2] = (byte)rm.Next(255);

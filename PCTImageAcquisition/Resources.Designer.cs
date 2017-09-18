@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace XPCTViewer.Properties {
+namespace PCTImageAcquisition {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace XPCTViewer.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("XPCTViewer.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PCTImageAcquisition.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,15 @@ namespace XPCTViewer.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ./capture_settings.ini.
+        /// </summary>
+        internal static string settingfilePath {
+            get {
+                return ResourceManager.GetString("settingfilePath", resourceCulture);
             }
         }
     }

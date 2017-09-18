@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempHexDisplay", "TempHexDisplay\TempHexDisplay.csproj", "{1FAF30B0-A4AA-4A37-800C-F10E1C0CED12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPCTViewer", "TempHexDisplay\XPCTViewer.csproj", "{1FAF30B0-A4AA-4A37-800C-F10E1C0CED12}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCTImageAcquisition", "PCTImageAcquisition\PCTImageAcquisition.csproj", "{3A53527E-1676-4FD2-9D4E-8E7556F9EBE4}"
 EndProject

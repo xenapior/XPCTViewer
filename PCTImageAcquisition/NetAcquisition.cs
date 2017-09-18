@@ -11,22 +11,22 @@ namespace PCTImageAcquisition
 	public class NetAcquisition : IDisposable
 	{
 		public bool IsRunning;
+
 		private int capturerPort = 8080;
 		private Action<byte[]> callbackFunc;
 		private IPEndPoint detector;
 		private UdpClient local;
 		private volatile bool requestStopCapture;
-		private const string SettingfilePath = "./capture_settings.ini";
 
 		[DllImport("kernel32")]
 		private static extern int GetPrivateProfileInt(string section, string key, int def, string filePath);
 
 		public NetAcquisition()
 		{
-			if (File.Exists(SettingfilePath))
+			if (File.Exists(Resources.settingfilePath))
 			{
 				StringBuilder str = new StringBuilder(16);
-				int port  = GetPrivateProfileInt("Network", "capturer port", 0, SettingfilePath);
+				int port  = GetPrivateProfileInt("Network", "capturer port", 0, Resources.settingfilePath);
 				if (port > 0)
 					capturerPort = port;
 			}
@@ -63,7 +63,7 @@ namespace PCTImageAcquisition
 					data = local.Receive(ref detector);
 				}
 				catch (SocketException)
-				{ }
+				{}
 				if (data != null)
 				{
 					callbackFunc(data);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace TempHexDisplay
+namespace XPCTViewer
 {
 	static class Program
 	{
