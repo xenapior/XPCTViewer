@@ -8,10 +8,8 @@ namespace PCTImageAcquisition
 	public class DataManager
 	{
 		public int Length;
-		public int[] Data;
+		public uint[] Data;
 		public int[] ModID;
-
-		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
 		public int FrameCapacity
 		{
 			get { return _frameCapacity; }
@@ -20,18 +18,19 @@ namespace PCTImageAcquisition
 				if (value > _frameCapacity)
 				{
 					_frameCapacity = value;
-					Data = new int[value * ImageLength];
+					Data = new uint[value * ImageLength];
 					ModID = new int[value];
 				}
 			}
 		}
+		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
 		private int _frameCapacity;
 		private Action callbackBufferfull;
 
-		public DataManager(int frameCapacity = 5000)
+		public DataManager(int frameCapacity = 50)
 		{
 			_frameCapacity = frameCapacity;
-			Data = new int[frameCapacity * ImageLength];
+			Data = new uint[frameCapacity * ImageLength];
 			ModID = new int[frameCapacity];
 			callbackBufferfull = () => { };
 		}
@@ -41,7 +40,7 @@ namespace PCTImageAcquisition
 			callbackBufferfull = cbFull;
 		}
 
-		public void Add(int modId, int[] imageInts)
+		public void Add(int modId, uint[] imageInts)
 		{
 			if (Length >= _frameCapacity)
 				Length = 0;

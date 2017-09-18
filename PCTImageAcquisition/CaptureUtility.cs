@@ -10,13 +10,13 @@ namespace PCTImageAcquisition
 		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
 		private static NetAcquisition capturer;
 		private static volatile DataManager dataManager;
-		private static readonly int[] blackImage;
+		private static readonly uint[] blackImage;
 
 		static CaptureUtility()
 		{
-			blackImage = new int[ImageLength];
+			blackImage = new uint[ImageLength];
 		}
-		public static int[] PeekMostRecentImage(int modId)
+		public static uint[] PeekMostRecentImage(int modId)
 		{
 			if (capturer == null)
 				return blackImage;
@@ -28,12 +28,12 @@ namespace PCTImageAcquisition
 				pos--;
 				if (pos < 0)
 					pos = dataManager.FrameCapacity - 1;
-				if (dataManager.Length - 1 == pos)  //not found over a round search
+				if (dataManager.Length == pos)  //not found over a round search
 				{
 					return blackImage;
 				}
 			}
-			int[] im = new int[ImageLength];
+			uint[] im = new uint[ImageLength];
 			Array.Copy(dataManager.Data, pos * ImageLength, im, 0, ImageLength);
 			return im;
 		}
@@ -67,7 +67,7 @@ namespace PCTImageAcquisition
 				return;
 			}
 			int modId;
-			int[] imageInts = Raw2Image.ExtractImageData(rawData, out modId);
+			uint[] imageInts = Raw2Image.ExtractImageData(rawData, out modId);
 
 			dataManager.Add(modId, imageInts);
 		}

@@ -161,6 +161,8 @@
 			this.updateIntevalBox.Size = new System.Drawing.Size(46, 21);
 			this.updateIntevalBox.TabIndex = 15;
 			this.updateIntevalBox.Text = "100";
+			this.updateIntevalBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.updateIntevalBox.Validating += new System.ComponentModel.CancelEventHandler(this.updateIntevalBox_Validating);
 			// 
 			// magBar
 			// 
@@ -211,19 +213,27 @@
 			// 
 			// grayscaleMaxBox
 			// 
+			this.grayscaleMaxBox.Enabled = false;
 			this.grayscaleMaxBox.Location = new System.Drawing.Point(195, 90);
 			this.grayscaleMaxBox.Name = "grayscaleMaxBox";
 			this.grayscaleMaxBox.Size = new System.Drawing.Size(46, 21);
 			this.grayscaleMaxBox.TabIndex = 30;
-			this.grayscaleMaxBox.Text = "100";
+			this.grayscaleMaxBox.Text = "FFFFFF";
+			this.grayscaleMaxBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.grayscaleMaxBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.grayscaleMaxBox_KeyPress);
+			this.grayscaleMaxBox.Validating += new System.ComponentModel.CancelEventHandler(this.grayscaleMaxBox_Validating);
 			// 
 			// grayscaleMinBox
 			// 
+			this.grayscaleMinBox.Enabled = false;
 			this.grayscaleMinBox.Location = new System.Drawing.Point(120, 90);
 			this.grayscaleMinBox.Name = "grayscaleMinBox";
 			this.grayscaleMinBox.Size = new System.Drawing.Size(46, 21);
 			this.grayscaleMinBox.TabIndex = 28;
-			this.grayscaleMinBox.Text = "100";
+			this.grayscaleMinBox.Text = "0";
+			this.grayscaleMinBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.grayscaleMinBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.grayscaleMinBox_KeyPress);
+			this.grayscaleMinBox.Validating += new System.ComponentModel.CancelEventHandler(this.grayscaleMinBox_Validating);
 			// 
 			// showSplitline
 			// 
@@ -245,7 +255,7 @@
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(113, 12);
 			this.label4.TabIndex = 29;
-			this.label4.Text = "指定灰度窗(十进制)";
+			this.label4.Text = "指定灰度窗(16进制)";
 			// 
 			// isGrayscaling
 			// 
@@ -313,7 +323,7 @@
 			this.saveasBtn.Name = "saveasBtn";
 			this.saveasBtn.Size = new System.Drawing.Size(126, 65);
 			this.saveasBtn.TabIndex = 24;
-			this.saveasBtn.Text = "另存为文件";
+			this.saveasBtn.Text = "设定保存文件名";
 			this.saveasBtn.UseVisualStyleBackColor = true;
 			this.saveasBtn.Click += new System.EventHandler(this.saveasBtn_Click);
 			// 
@@ -347,6 +357,7 @@
 			this.accumNumBox.Size = new System.Drawing.Size(46, 21);
 			this.accumNumBox.TabIndex = 23;
 			this.accumNumBox.Text = "1";
+			this.accumNumBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// autosaveBtn
 			// 
@@ -370,7 +381,7 @@
 			// 
 			// saveFileDialog1
 			// 
-			this.saveFileDialog1.Filter = "Raw数据文件|*.dat";
+			this.saveFileDialog1.Filter = "XPCT数据文件|*.bin";
 			// 
 			// statusStrip
 			// 

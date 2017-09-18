@@ -48,11 +48,11 @@ namespace PCTImageAcquisition
 		}
 
 		// Make sure to check for udpData validity beforehand using IsValidFrame(udpData)
-		public static int[] ExtractImageData(byte[] udpData, out int moduleId)
+		public static uint[] ExtractImageData(byte[] udpData, out int moduleId)
 		{
 			int standardLength = ImageCol * ImageRow;
-			int[] pxData = new int[standardLength];
-			int hi, mid, low;
+			uint[] pxData = new uint[standardLength];
+			uint hi, mid, low;
 			if (BigEndian)
 			{
 				for (int i = 0; i < standardLength; i++)

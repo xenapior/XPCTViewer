@@ -12,21 +12,21 @@ namespace XPCTViewer
 	internal class Image2Bmp
 	{
 		public Bitmap[] BmpImages;
-		public int PlotMax, PlotMin;
+		public uint PlotMax, PlotMin;
 		public int Mag = 8;
 		public bool bGrayscaling = true, bShowModuleBorder = true;
-		public readonly int[][] BufferInts;
-		public int DataMax, DataMin;
+		public readonly uint[][] BufferInts;
+		public uint DataMax, DataMin;
 
 		public Image2Bmp()
 		{
 			BmpImages = new Bitmap[Raw2Image.NumDetectorModules];
-			BufferInts = new int[Raw2Image.NumDetectorModules][];
+			BufferInts = new uint[Raw2Image.NumDetectorModules][];
 
 			for (int i = 0; i < BmpImages.Length; i++)
 			{
 				BmpImages[i] = new Bitmap(Raw2Image.ImageCol * Mag, Raw2Image.ImageRow * Mag, PixelFormat.Format24bppRgb);
-				BufferInts[i] = new int[Raw2Image.ImageCol * Raw2Image.ImageRow];
+				BufferInts[i] = new uint[Raw2Image.ImageCol * Raw2Image.ImageRow];
 			}
 		}
 
@@ -35,12 +35,12 @@ namespace XPCTViewer
 		/// </summary>
 		/// <param name="imageInts">Source data in int32</param>
 		/// <param name="position">0-based position of the bitmap</param>
-		public void FillBufferData(int[] imageInts, int position)
+		public void FillBufferData(uint[] imageInts, int position)
 		{
 			imageInts.CopyTo(BufferInts[position], 0);
 		}
 
-		private void UpdateBitmap(int[] imageInts, int position)
+		private void UpdateBitmap(uint[] imageInts, int position)
 		{
 			int w = Raw2Image.ImageCol * Mag;
 			int h = Raw2Image.ImageRow * Mag;
@@ -67,7 +67,7 @@ namespace XPCTViewer
 				{
 					for (int j = 0; j < w; j++)
 					{
-						int pixeldata = imageInts[(i / Mag) * Raw2Image.ImageCol + j / Mag];
+						uint pixeldata = imageInts[(i / Mag) * Raw2Image.ImageCol + j / Mag];
 						pixeldata = pixeldata < PlotMax ? pixeldata : PlotMax;
 						pixeldata = pixeldata > PlotMin ? pixeldata : PlotMin;
 						byte grayscale = (byte)((pixeldata - PlotMin) * 255 / (PlotMax - PlotMin));
@@ -93,7 +93,7 @@ namespace XPCTViewer
 		public void UpdateAllBitmaps()
 		{
 			DataMax = 0;
-			DataMin = 0xffffff; // not Int32.MaxValue because it's 24-bit
+			DataMin = 0xffffff; // not UInt32.MaxValue because it's 24-bit
 			for (int i = 0; i < BufferInts.Length; i++)
 			{
 				for (int j = 0; j < BufferInts[i].Length; j++)
