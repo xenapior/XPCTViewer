@@ -20,7 +20,6 @@ namespace PCTImageAcquisition
 		public int TargetPort = 8080;
 		public int SendingPort = 80;
 		public int OffsetPeriod=800000;
-		public int FramePeriod = 100;
 
 		private IPEndPoint targetEndPoint;
 		private UdpClient local;
@@ -80,8 +79,7 @@ namespace PCTImageAcquisition
 				if (counter > Raw2Image.NumDetectorModules)
 					counter = 1;
 				local.Send(datagm, datagm.Length, targetEndPoint);
-				if (FramePeriod!=0)
-					Thread.Sleep(FramePeriod);
+//				Thread.Sleep(10);
 			}
 			requestStopCapture = false;
 			IsRunning = false;
@@ -91,7 +89,7 @@ namespace PCTImageAcquisition
 		{
 			byte[] data = new byte[ImageLength * Raw2Image.PixelBytes + FrameHeader + FrameTrailer];
 
-			data[0] = (byte)(0xf8 * (rm.Next(100) > 0 ? 1 : 0)); //set chance to send Invalid data
+			data[0] = 0xf8;//(byte)(0xf8 * (rm.Next(100) > 0 ? 1 : 0)); //set chance to send Invalid data
 			data[1] = (byte)modId;
 			uint baseOffset = (uint) ((Math.Sin(2*Math.PI*(baseOffsetCounter++)/OffsetPeriod) + 1)*0x780000);
 			if (baseOffsetCounter > OffsetPeriod)
@@ -101,8 +99,8 @@ namespace PCTImageAcquisition
 			{
 				uint pxVal=baseOffset+ (uint)rm.Next(0xfffff);
 				int p = FrameHeader + i * Raw2Image.PixelBytes;
-				data[p] = (byte)(pxVal>>16);
-				data[p + 1] = (byte) (pxVal >> 8);
+				data[p] = 0;//(byte)(pxVal>>16);
+				data[p + 1] = 0xff;//(byte) (pxVal >> 8);
 				data[p + 2] = (byte)(pxVal);
 			}
 			return data;

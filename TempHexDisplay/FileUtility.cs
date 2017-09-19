@@ -11,14 +11,14 @@ namespace XPCTViewer
 	{
 		private uint[] memBuffer;
 		private int[] modId;
-		private Stream fileStream;
+		private FileStream fileStream;
 		private DataManager dataMan;
 
 		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
 		private const int pb = Raw2Image.PixelBytes;
 		private const int FrameLength = 4 + ImageLength * pb;
 		private byte[] binform;
-		public FileUtility(Stream fStream, DataManager dMan)
+		public FileUtility(FileStream fStream, DataManager dMan)
 		{
 			fileStream = fStream;
 			dataMan = dMan;
@@ -62,7 +62,7 @@ namespace XPCTViewer
 		{
 			dataMan.Data.CopyTo(memBuffer, 0);
 			dataMan.ModID.CopyTo(modId, 0);
-			for (int i = 0; i < dataMan.FrameCapacity; i++)
+			for (int i = 0; i < dataMan.Length; i++)
 			{
 				binform[i * FrameLength] = (byte)dataMan.ModID[i];
 				for (int j = 0; j < ImageLength; j++)

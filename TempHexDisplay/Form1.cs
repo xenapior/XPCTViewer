@@ -123,7 +123,7 @@ namespace XPCTViewer
 						netCaptureBtn.Checked = false;
 						return;
 					}
-					file = new FileUtility(saveFileDialog1.OpenFile(), dataMan);
+					file = new FileUtility(File.OpenWrite(saveFileDialog1.FileName), dataMan);
 					file.WriteHeader();
 				}
 				netCaptureBtn.Text = "停止网络采集";
@@ -138,7 +138,7 @@ namespace XPCTViewer
 			netCaptureBtn.Text = "开始网络采集";
 			updateTimer.Stop();
 			acqGrp.Enabled = true;
-			if (autosaveBtn.Checked&&file!=null) 
+			if (autosaveBtn.Checked && file != null)
 			{
 				file.Flush();
 				file.Dispose();
