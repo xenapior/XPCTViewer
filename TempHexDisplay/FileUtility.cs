@@ -18,6 +18,8 @@ namespace XPCTViewer
 		private const int pb = Raw2Image.PixelBytes;
 		private const int FrameLength = 4 + ImageLength * pb;
 		private byte[] binform;
+		private int nFrames;
+
 		public FileUtility(FileStream fStream, DataManager dMan)
 		{
 			fileStream = fStream;
@@ -25,7 +27,7 @@ namespace XPCTViewer
 			dataMan.SetBufferfullCallback(cbSave2FileAsync);
 			memBuffer = new uint[ImageLength * dataMan.FrameCapacity];
 			modId = new int[dataMan.FrameCapacity];
-			binform=new byte[FrameLength * dataMan.FrameCapacity];
+			binform = new byte[FrameLength * dataMan.FrameCapacity];
 		}
 
 		public void Dispose()
@@ -40,8 +42,12 @@ namespace XPCTViewer
 		public void WriteHeader()
 		{
 			byte[] header = new byte[16];
-			byte[] XPCT = Encoding.ASCII.GetBytes("XPCT");
-			XPCT.CopyTo(header, 0);
+			header[0] = 0x58;	//'X'
+			header[1] = 0x50;	//'P'
+			header[2] = 0x43;	//'C'
+			header[3] = 0x54;	//'T'
+			header[8] = 0x84;
+			header[9] = 0x4;	// 0x484 = FrameLength
 			fileStream.Write(header, 0, 16);
 		}
 
@@ -49,31 +55,37 @@ namespace XPCTViewer
 		{
 			byte[] header = new byte[16];
 			fileStream.Read(header, 0, 16);
-			byte[] XPCT = Encoding.ASCII.GetBytes("XPCT");
+			byte[] XPCT = {0x58, 0x50, 0x43, 0x54};
 			for (int i = 0; i < 4; i++)
 			{
 				if (header[i] != XPCT[i])
 					return false;
 			}
+			nFrames = BitConverter.ToInt32(header, 4);
 			return true;
 		}
 
-		public void Flush()
+		public void EndWriting()
 		{
 			dataMan.Data.CopyTo(memBuffer, 0);
 			dataMan.ModID.CopyTo(modId, 0);
 			for (int i = 0; i < dataMan.Length; i++)
 			{
-				binform[i * FrameLength] = (byte)dataMan.ModID[i];
+				int frameStart = i * FrameLength;
+				binform[frameStart] = (byte)dataMan.ModID[i];
 				for (int j = 0; j < ImageLength; j++)
 				{
 					uint pxInt = dataMan.Data[i * ImageLength + j];
-					binform[4 + j * pb] = (byte)(pxInt >> 16);
-					binform[5 + j * pb] = (byte)(pxInt >> 8);
-					binform[6 + j * pb] = (byte)pxInt;
+					int sub = 4 + frameStart + j * pb;
+					binform[sub] = (byte)(pxInt >> 16);
+					binform[sub + 1] = (byte)(pxInt >> 8);
+					binform[sub + 2] = (byte)pxInt;
 				}
 			}
-			fileStream.WriteAsync(binform, 0, dataMan.Length*FrameLength);
+			fileStream.Write(binform, 0, dataMan.Length * FrameLength);
+			nFrames += dataMan.Length;
+			fileStream.Seek(4, SeekOrigin.Begin);	// seek to 0x4 header position
+			fileStream.Write(BitConverter.GetBytes(nFrames),0,4);
 			dataMan.Clear();
 		}
 
@@ -81,19 +93,27 @@ namespace XPCTViewer
 		{
 			dataMan.Data.CopyTo(memBuffer, 0);
 			dataMan.ModID.CopyTo(modId, 0);
-			for (int i = 0; i < dataMan.FrameCapacity; i++)
+			unsafe
 			{
-				binform[i * FrameLength] = (byte)dataMan.ModID[i];
-				for (int j = 0; j < ImageLength; j++)
+				fixed (byte* pbinform = binform)
 				{
-					uint pxInt = dataMan.Data[i * ImageLength + j];
-					int sub = i * FrameLength + j * pb + 4;
-					binform[sub] = (byte)(pxInt >> 16);
-					binform[sub + 1] = (byte)(pxInt >> 8);
-					binform[sub + 2] = (byte)pxInt;
+					for (int i = 0; i < dataMan.FrameCapacity; i++)
+					{
+						int frameStart = i * FrameLength;
+						*(pbinform + frameStart) = (byte)dataMan.ModID[i];
+						for (int j = 0; j < ImageLength; j++)
+						{
+							uint pxInt = dataMan.Data[i * ImageLength + j];
+							byte* sub = pbinform + 4 + frameStart + j * pb;
+							*(sub) = (byte)(pxInt >> 16);
+							*(sub + 1) = (byte)(pxInt >> 8);
+							*(sub + 2) = (byte)pxInt;
+						}
+					}
 				}
 			}
 			fileStream.WriteAsync(binform, 0, binform.Length);
+			nFrames += dataMan.FrameCapacity;
 			dataMan.Clear();
 		}
 	}

@@ -79,7 +79,7 @@ namespace PCTImageAcquisition
 				if (counter > Raw2Image.NumDetectorModules)
 					counter = 1;
 				local.Send(datagm, datagm.Length, targetEndPoint);
-//				Thread.Sleep(10);
+				Thread.Sleep(10);
 			}
 			requestStopCapture = false;
 			IsRunning = false;
@@ -89,7 +89,9 @@ namespace PCTImageAcquisition
 		{
 			byte[] data = new byte[ImageLength * Raw2Image.PixelBytes + FrameHeader + FrameTrailer];
 
-			data[0] = 0xf8;//(byte)(0xf8 * (rm.Next(100) > 0 ? 1 : 0)); //set chance to send Invalid data
+			data[0] = 0xf8;
+			if (baseOffsetCounter >= 40)
+				data[0] = 0;
 			data[1] = (byte)modId;
 			uint baseOffset = (uint) ((Math.Sin(2*Math.PI*(baseOffsetCounter++)/OffsetPeriod) + 1)*0x780000);
 			if (baseOffsetCounter > OffsetPeriod)
@@ -99,9 +101,9 @@ namespace PCTImageAcquisition
 			{
 				uint pxVal=baseOffset+ (uint)rm.Next(0xfffff);
 				int p = FrameHeader + i * Raw2Image.PixelBytes;
-				data[p] = 0;//(byte)(pxVal>>16);
-				data[p + 1] = 0xff;//(byte) (pxVal >> 8);
-				data[p + 2] = (byte)(pxVal);
+				data[p] = (byte)(modId);//(byte)(pxVal>>16);
+				data[p + 1] = (byte)(modId);//(byte) (pxVal >> 8);
+				data[p + 2] = (byte)(modId);
 			}
 			return data;
 		}

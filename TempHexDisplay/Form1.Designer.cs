@@ -84,13 +84,13 @@
 			// 
 			// openFileDialog1
 			// 
-			this.openFileDialog1.Filter = "All files (*.*)|*.*";
+			this.openFileDialog1.Filter = "XPCT数据文件|*.bin";
 			// 
 			// exitBtn
 			// 
-			this.exitBtn.Location = new System.Drawing.Point(870, 364);
+			this.exitBtn.Location = new System.Drawing.Point(848, 364);
 			this.exitBtn.Name = "exitBtn";
-			this.exitBtn.Size = new System.Drawing.Size(104, 65);
+			this.exitBtn.Size = new System.Drawing.Size(126, 65);
 			this.exitBtn.TabIndex = 6;
 			this.exitBtn.Text = "退出";
 			this.exitBtn.UseVisualStyleBackColor = true;
@@ -295,6 +295,8 @@
 			// netCaptureBtn
 			// 
 			this.netCaptureBtn.Appearance = System.Windows.Forms.Appearance.Button;
+			this.netCaptureBtn.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+			this.netCaptureBtn.ForeColor = System.Drawing.SystemColors.ControlText;
 			this.netCaptureBtn.Location = new System.Drawing.Point(500, 364);
 			this.netCaptureBtn.Name = "netCaptureBtn";
 			this.netCaptureBtn.Size = new System.Drawing.Size(126, 65);
@@ -307,10 +309,10 @@
 			// pseudoDataBtn
 			// 
 			this.pseudoDataBtn.Appearance = System.Windows.Forms.Appearance.Button;
-			this.pseudoDataBtn.ForeColor = System.Drawing.Color.Blue;
-			this.pseudoDataBtn.Location = new System.Drawing.Point(760, 364);
+			this.pseudoDataBtn.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.pseudoDataBtn.Location = new System.Drawing.Point(716, 364);
 			this.pseudoDataBtn.Name = "pseudoDataBtn";
-			this.pseudoDataBtn.Size = new System.Drawing.Size(104, 65);
+			this.pseudoDataBtn.Size = new System.Drawing.Size(126, 65);
 			this.pseudoDataBtn.TabIndex = 23;
 			this.pseudoDataBtn.Text = "发送测试数据";
 			this.pseudoDataBtn.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -335,6 +337,7 @@
 			this.openfileBtn.TabIndex = 25;
 			this.openfileBtn.Text = "打开文件";
 			this.openfileBtn.UseVisualStyleBackColor = true;
+			this.openfileBtn.Click += new System.EventHandler(this.openfileBtn_Click);
 			// 
 			// acqGrp
 			// 
