@@ -5,12 +5,15 @@ using System.Text;
 
 namespace PCTImageAcquisition
 {
+	/// <summary>
+	/// Buffer for extracted UInt32 frame data and history peeking
+	/// </summary>
 	public class DataManager
 	{
-		public int Length;
-		public uint[] Data;
-		public int[] ModID;
-		public int FrameCapacity
+		public int Length;		// frame counter
+		public uint[] Data;		// pixel data in uint format
+		public int[] ModID;		// corresponding module IDs
+		public int FrameCapacity	//buffer capacity in num of frames
 		{
 			get { return _frameCapacity; }
 			set
@@ -25,13 +28,15 @@ namespace PCTImageAcquisition
 		}
 		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
 		private int _frameCapacity;
-		private Action callbackBufferfull;
+		private readonly uint[] blackImage;  // accelerate data peeking
+		private Action callbackBufferfull;	// triggers when buffer is full
 
-		public DataManager(int frameCapacity = 50)
+		public DataManager(int frameCapacity = 500)
 		{
 			_frameCapacity = frameCapacity;
 			Data = new uint[frameCapacity * ImageLength];
 			ModID = new int[frameCapacity];
+			blackImage = new uint[ImageLength];
 			callbackBufferfull = () => { };
 		}
 
@@ -55,5 +60,28 @@ namespace PCTImageAcquisition
 		{
 			Length = 0;
 		}
+		/// <summary>
+		/// Find the most recent image in the buffer
+		/// </summary>
+		/// <param name="modId">ID of the module</param>
+		/// <returns>Content of the image data. Returns all-0 image if not found</returns>
+		public uint[] PeekMostRecentImage(int modId)
+		{
+			int pos = Length == 0 ? 0 : Length - 1;
+			while (true)
+			{
+				if (ModID[pos] == modId)
+					break;
+				pos--;
+				if (pos < 0)
+					pos = FrameCapacity - 1;
+				if (Length == pos)  //not found over a round search
+					return blackImage;
+			}
+			uint[] im = new uint[ImageLength];
+			Array.Copy(Data, pos * ImageLength, im, 0, ImageLength);
+			return im;
+		}
+
 	}
 }

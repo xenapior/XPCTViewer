@@ -72,7 +72,6 @@ namespace XPCTViewer
 		{
 			const int w = Raw2Image.ImageCol, h = Raw2Image.ImageRow;
 			int x = e.X / i2b.Mag, y = e.Y / i2b.Mag;
-
 			if (x >= Raw2Image.NumDetectorModules * w || y >= h)
 				return;
 			int modLoc = x / w;
@@ -97,7 +96,7 @@ namespace XPCTViewer
 		private void updateTimer_Tick(object sender, EventArgs e)
 		{
 			for (int i = 0; i < Raw2Image.NumDetectorModules; i++)
-				i2b.FillBufferData(CaptureUtility.PeekMostRecentImage(i + 1), i);
+				i2b.FillBufferData(dataMan.PeekMostRecentImage(i + 1), i);
 			picBox.Invalidate();
 
 			maxLbl.Text = string.Format("最大值{0}/0x{0:X}", i2b.DataMax);
@@ -131,7 +130,7 @@ namespace XPCTViewer
 				acqGrp.Enabled = false;
 				updateTimer.Interval = Convert.ToInt32(updateIntevalBox.Text);
 
-				CaptureUtility.CaptureAndStore(dataMan);
+				CaptureUtility.StartCaptureAsync(dataMan);
 				updateTimer.Start();
 				return;
 			}
@@ -139,10 +138,11 @@ namespace XPCTViewer
 			netCaptureBtn.Text = "开始网络采集";
 			updateTimer.Stop();
 			acqGrp.Enabled = true;
-			if (autosaveBtn.Checked)
+			if (autosaveBtn.Checked&&file!=null) 
 			{
 				file.Flush();
 				file.Dispose();
+				file = null;
 			}
 		}
 
@@ -165,7 +165,8 @@ namespace XPCTViewer
 			if (saveFileDialog1.ShowDialog() != DialogResult.OK)
 				return;
 			saveasBtn.Text = @"数据保存为
-" + saveFileDialog1.FileName;
+
+" + saveFileDialog1.FileName;
 			autosaveBtn.Checked = true;
 		}
 

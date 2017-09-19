@@ -3,41 +3,17 @@
 
 namespace PCTImageAcquisition
 {
+	/// <summary>
+	/// Simple wrapper for easier use
+	/// </summary>
 	public static class CaptureUtility
 	{
 		public static int __numInvalidFrames;   //only for debug
 
-		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
-		private static NetAcquisition capturer;
-		private static volatile DataManager dataManager;
-		private static readonly uint[] blackImage;
+		private static NetAcquisition capturer;		// network layer for capturing
+		private static volatile DataManager dataManager;	// data storage manager
 
-		static CaptureUtility()
-		{
-			blackImage = new uint[ImageLength];
-		}
-		public static uint[] PeekMostRecentImage(int modId)
-		{
-			if (capturer == null)
-				return blackImage;
-			int pos = dataManager.Length == 0 ? 0 : dataManager.Length - 1;
-			while (true)
-			{
-				if (dataManager.ModID[pos] == modId)
-					break;
-				pos--;
-				if (pos < 0)
-					pos = dataManager.FrameCapacity - 1;
-				if (dataManager.Length == pos)  //not found over a round search
-				{
-					return blackImage;
-				}
-			}
-			uint[] im = new uint[ImageLength];
-			Array.Copy(dataManager.Data, pos * ImageLength, im, 0, ImageLength);
-			return im;
-		}
-
+		// Send a stop request
 		public static void StopCapture()
 		{
 			if (capturer == null)
@@ -47,7 +23,8 @@ namespace PCTImageAcquisition
 			capturer.StopAcquistion();
 		}
 
-		public static bool CaptureAndStore(DataManager dataMan)
+		// Start capturing and write it to DataManager
+		public static bool StartCaptureAsync(DataManager dataMan)
 		{
 			if (capturer == null)
 				capturer = new NetAcquisition();

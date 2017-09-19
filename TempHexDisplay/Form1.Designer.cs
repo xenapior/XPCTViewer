@@ -295,7 +295,7 @@
 			// netCaptureBtn
 			// 
 			this.netCaptureBtn.Appearance = System.Windows.Forms.Appearance.Button;
-			this.netCaptureBtn.Location = new System.Drawing.Point(368, 364);
+			this.netCaptureBtn.Location = new System.Drawing.Point(500, 364);
 			this.netCaptureBtn.Name = "netCaptureBtn";
 			this.netCaptureBtn.Size = new System.Drawing.Size(126, 65);
 			this.netCaptureBtn.TabIndex = 22;
@@ -319,7 +319,7 @@
 			// 
 			// saveasBtn
 			// 
-			this.saveasBtn.Location = new System.Drawing.Point(144, 364);
+			this.saveasBtn.Location = new System.Drawing.Point(368, 364);
 			this.saveasBtn.Name = "saveasBtn";
 			this.saveasBtn.Size = new System.Drawing.Size(126, 65);
 			this.saveasBtn.TabIndex = 24;
@@ -398,7 +398,7 @@
 			this.status1.AutoSize = false;
 			this.status1.Name = "status1";
 			this.status1.Size = new System.Drawing.Size(200, 17);
-			this.status1.Text = "状态1";
+			this.status1.Text = "就绪";
 			// 
 			// Form1
 			// 

@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PCTImageAcquisition
@@ -39,10 +40,11 @@ namespace PCTImageAcquisition
 			if (local == null)
 			{
 				local = new UdpClient(capturerPort);
-				local.Client.ReceiveTimeout = 100;  //mininum response time ~200ms
+				local.Client.ReceiveTimeout = 200;  //mininum response time ~200ms
 			}
-			Task t = new Task(workerThread);
-			t.Start();
+			Thread acqThread=new Thread(workerThread);
+			acqThread.Priority=ThreadPriority.AboveNormal;
+			acqThread.Start();
 		}
 
 		public void StopAcquistion()
@@ -70,7 +72,6 @@ namespace PCTImageAcquisition
 					data = null;
 				}
 			}
-
 			requestStopCapture = false;
 			IsRunning = false;
 		}

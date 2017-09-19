@@ -31,7 +31,7 @@ namespace XPCTViewer
 		}
 
 		/// <summary>
-		/// Fill imageInts to the bitmap located at position
+		/// Fill image data to bitmap at position
 		/// </summary>
 		/// <param name="imageInts">Source data in int32</param>
 		/// <param name="position">0-based position of the bitmap</param>
@@ -87,9 +87,8 @@ namespace XPCTViewer
 		}
 
 		/// <summary>
-		/// Update Bitmap at position X with buffered data
+		/// Update all bitmaps using buffered data
 		/// </summary>
-		/// <param name="X">0-based position of the bitmap. Set to -1 to update all bitmaps</param>
 		public void UpdateAllBitmaps()
 		{
 			DataMax = 0;
