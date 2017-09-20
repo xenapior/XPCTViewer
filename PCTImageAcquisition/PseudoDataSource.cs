@@ -93,17 +93,14 @@ namespace PCTImageAcquisition
 			if (baseOffsetCounter >= 40)
 				data[0] = 0;
 			data[1] = (byte)modId;
-			uint baseOffset = (uint) ((Math.Sin(2*Math.PI*(baseOffsetCounter++)/OffsetPeriod) + 1)*0x780000);
-			if (baseOffsetCounter > OffsetPeriod)
-				baseOffsetCounter = 0;
 
 			for (int i = 0; i < ImageLength; i++)
 			{
-				uint pxVal=baseOffset+ (uint)rm.Next(0xfffff);
+				uint pxVal=(uint)rm.Next(0x100);
 				int p = FrameHeader + i * Raw2Image.PixelBytes;
-				data[p] = (byte)(modId);//(byte)(pxVal>>16);
-				data[p + 1] = (byte)(modId);//(byte) (pxVal >> 8);
-				data[p + 2] = (byte)(modId);
+				data[p] = (byte)modId;
+				data[p + 1] = (byte)pxVal;
+				data[p + 2] = 0;
 			}
 			return data;
 		}

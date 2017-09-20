@@ -7,24 +7,25 @@ using System.Threading.Tasks;
 using PCTImageAcquisition;
 namespace XPCTViewer
 {
-	public class FileUtility : IDisposable
+	public class FileHandler : IDisposable
 	{
+		public int NumFrames;
+
 		private uint[] memBuffer;
 		private int[] modId;
+		private byte[] binform;
 		private FileStream fileStream;
 		private DataManager dataMan;
-
 		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
 		private const int pb = Raw2Image.PixelBytes;
 		private const int FrameLength = 4 + ImageLength * pb;
-		private byte[] binform;
 		private int nFrames;
 
-		public FileUtility(FileStream fStream, DataManager dMan)
+		public FileHandler(FileStream fStream, DataManager dMan)
 		{
 			fileStream = fStream;
 			dataMan = dMan;
-			dataMan.SetBufferfullCallback(cbSave2FileAsync);
+			dataMan.SetBufferfullCallback(cbSaveToFile);
 			memBuffer = new uint[ImageLength * dataMan.FrameCapacity];
 			modId = new int[dataMan.FrameCapacity];
 			binform = new byte[FrameLength * dataMan.FrameCapacity];
@@ -47,7 +48,7 @@ namespace XPCTViewer
 			header[2] = 0x43;	//'C'
 			header[3] = 0x54;	//'T'
 			header[8] = 0x84;
-			header[9] = 0x4;	// 0x484 = FrameLength
+			header[9] = 0x4;	// 0x484 = 1156 is the FrameLength
 			fileStream.Write(header, 0, 16);
 		}
 
@@ -61,7 +62,7 @@ namespace XPCTViewer
 				if (header[i] != XPCT[i])
 					return false;
 			}
-			nFrames = BitConverter.ToInt32(header, 4);
+			NumFrames = BitConverter.ToInt32(header, 4);
 			return true;
 		}
 
@@ -89,7 +90,7 @@ namespace XPCTViewer
 			dataMan.Clear();
 		}
 
-		private void cbSave2FileAsync()
+		private void cbSaveToFile()
 		{
 			dataMan.Data.CopyTo(memBuffer, 0);
 			dataMan.ModID.CopyTo(modId, 0);
@@ -115,6 +116,22 @@ namespace XPCTViewer
 			fileStream.WriteAsync(binform, 0, binform.Length);
 			nFrames += dataMan.FrameCapacity;
 			dataMan.Clear();
+		}
+
+		/// <summary>
+		/// Load into DataManager the frames around position
+		/// </summary>
+		/// <param name="position"></param>
+		/// <returns>Relative location of position in the new segment. -1 for error</returns>
+		public int LoadFileSegmentAtPos(int position)
+		{
+			if (position >= NumFrames)
+				return -1;
+
+			int halfWidth = dataMan.FrameCapacity/2;
+			halfWidth = halfWidth > NumFrames/2 ? NumFrames/2 : halfWidth;
+			int maxPos = position + halfWidth;
+			int minPos = position - halfWidth;
 		}
 	}
 }

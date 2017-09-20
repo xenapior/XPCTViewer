@@ -21,7 +21,7 @@ namespace XPCTViewer
 	{
 		private DataManager dataMan = new DataManager();
 		private Image2Bmp i2b = new Image2Bmp();
-		private FileUtility file;
+		private FileHandler file;
 		private PseudoDataSource pseu;
 
 		public Form1()
@@ -66,11 +66,14 @@ namespace XPCTViewer
 
 		private void frameScrl_Scroll(object sender, ScrollEventArgs e)
 		{
+			if (file == null || file.NumFrames == 0)
+				return;
 		}
 
 		private void displayBox_MouseMove(object sender, MouseEventArgs e)
 		{
 			const int w = Raw2Image.ImageCol, h = Raw2Image.ImageRow;
+			
 			int x = e.X / i2b.Mag, y = e.Y / i2b.Mag;
 			if (x >= Raw2Image.NumDetectorModules * w || y >= h)
 				return;
@@ -123,11 +126,13 @@ namespace XPCTViewer
 						netCaptureBtn.Checked = false;
 						return;
 					}
-					file = new FileUtility(File.Create(saveFileDialog1.FileName), dataMan);
+					file?.Dispose();
+					file = new FileHandler(File.Create(saveFileDialog1.FileName), dataMan);
 					file.WriteHeader();
 				}
-				netCaptureBtn.Text = "停止网络采集";
+				openfileBtn.Enabled = false;
 				acqGrp.Enabled = false;
+				netCaptureBtn.Text = "停止网络采集";
 				updateTimer.Interval = Convert.ToInt32(updateIntevalBox.Text);
 
 				CaptureUtility.StartCaptureAsync(dataMan);
@@ -135,9 +140,10 @@ namespace XPCTViewer
 				return;
 			}
 			CaptureUtility.StopCapture();
-			netCaptureBtn.Text = "开始网络采集";
 			updateTimer.Stop();
+			openfileBtn.Enabled = true;
 			acqGrp.Enabled = true;
+			netCaptureBtn.Text = "开始网络采集";
 			if (autosaveBtn.Checked && file != null)
 			{
 				file.EndWriting();
@@ -257,7 +263,13 @@ namespace XPCTViewer
 
 		private void openfileBtn_Click(object sender, EventArgs e)
 		{
-			
+			if (openFileDialog1.ShowDialog() != DialogResult.OK)
+				return;
+			frameScrl.Value = 0;
+			file?.Dispose();
+			dataMan.Clear();
+			file=new FileHandler(File.OpenRead(openFileDialog1.FileName),dataMan);
+			file
 		}
 	}
 }

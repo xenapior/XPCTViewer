@@ -31,7 +31,7 @@ namespace XPCTViewer
 		}
 
 		/// <summary>
-		/// Fill image data to bitmap at position
+		/// Copy image data into target buffer
 		/// </summary>
 		/// <param name="imageInts">Source data in int32</param>
 		/// <param name="position">0-based position of the bitmap</param>
@@ -52,34 +52,36 @@ namespace XPCTViewer
 					BmpImages[i] = new Bitmap(w, h, PixelFormat.Format24bppRgb);
 				}
 			}
-			var pdata = BmpImages[position].LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-			int s = pdata.Stride;
 			if (bGrayscaling)
 			{
 				PlotMax = DataMax;
 				PlotMin = DataMin;
 			}
 			PlotMax = PlotMax > PlotMin ? PlotMax : PlotMin + 1;
+			var pdata = BmpImages[position].LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+			int s = pdata.Stride;
 			unsafe
 			{
 				byte* addr = (byte*)pdata.Scan0;
 				for (int i = 0; i < h; i++)
 				{
+					byte* baseOffset = addr + i * s;
 					for (int j = 0; j < w; j++)
 					{
 						uint pixeldata = imageInts[(i / Mag) * Raw2Image.ImageCol + j / Mag];
 						pixeldata = pixeldata < PlotMax ? pixeldata : PlotMax;
 						pixeldata = pixeldata > PlotMin ? pixeldata : PlotMin;
 						byte grayscale = (byte)((pixeldata - PlotMin) * 255 / (PlotMax - PlotMin));
-						addr[i * s + j * 3] = grayscale;
-						addr[i * s + j * 3 + 1] = grayscale;
-						addr[i * s + j * 3 + 2] = grayscale;
+						byte* pxPos = baseOffset + j * 3;
+						*(pxPos) = grayscale;
+						*(pxPos + 1) = grayscale;
+						*(pxPos + 2) = grayscale;
 					}
 					if (bShowModuleBorder)
 					{
-						addr[i * s] = 0;
-						addr[i * s + 1] = 0xff;
-						addr[i * s + 2] = 0;
+						*(baseOffset) = 0;
+						*(baseOffset + 1) = 0xff;
+						*(baseOffset + 2) = 0;
 					}
 				}
 			}

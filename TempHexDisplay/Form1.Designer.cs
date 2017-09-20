@@ -63,6 +63,7 @@
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.status1 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.pixelValTip = new System.Windows.Forms.ToolTip(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.picBox)).BeginInit();
 			this.datapropGrp.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.magBar)).BeginInit();
@@ -240,11 +241,11 @@
 			this.showSplitline.AutoSize = true;
 			this.showSplitline.Checked = true;
 			this.showSplitline.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.showSplitline.Location = new System.Drawing.Point(110, 64);
+			this.showSplitline.Location = new System.Drawing.Point(133, 64);
 			this.showSplitline.Name = "showSplitline";
-			this.showSplitline.Size = new System.Drawing.Size(84, 16);
+			this.showSplitline.Size = new System.Drawing.Size(108, 16);
 			this.showSplitline.TabIndex = 19;
-			this.showSplitline.Text = "块分隔标记";
+			this.showSplitline.Text = "显示块间分隔线";
 			this.showSplitline.UseVisualStyleBackColor = true;
 			this.showSplitline.CheckedChanged += new System.EventHandler(this.showSplitlineChk_CheckedChanged);
 			// 
@@ -403,6 +404,12 @@
 			this.status1.Size = new System.Drawing.Size(200, 17);
 			this.status1.Text = "就绪";
 			// 
+			// pixelValTip
+			// 
+			this.pixelValTip.AutomaticDelay = 0;
+			this.pixelValTip.UseAnimation = false;
+			this.pixelValTip.UseFading = false;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -473,6 +480,7 @@
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.StatusStrip statusStrip;
 		private System.Windows.Forms.ToolStripStatusLabel status1;
+		private System.Windows.Forms.ToolTip pixelValTip;
 	}
 }
 
