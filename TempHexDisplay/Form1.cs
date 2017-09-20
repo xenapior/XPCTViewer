@@ -21,7 +21,7 @@ namespace XPCTViewer
 	{
 		private DataManager dataMan = new DataManager();
 		private Image2Bmp i2b = new Image2Bmp();
-		private FileHandler file;
+		private FileManager file;
 		private PseudoDataSource pseu;
 
 		public Form1()
@@ -127,7 +127,7 @@ namespace XPCTViewer
 						return;
 					}
 					file?.Dispose();
-					file = new FileHandler(File.Create(saveFileDialog1.FileName), dataMan);
+					file = new FileManager(File.Create(saveFileDialog1.FileName), dataMan);
 					file.WriteHeader();
 				}
 				openfileBtn.Enabled = false;
@@ -268,8 +268,8 @@ namespace XPCTViewer
 			frameScrl.Value = 0;
 			file?.Dispose();
 			dataMan.Clear();
-			file=new FileHandler(File.OpenRead(openFileDialog1.FileName),dataMan);
-			file
+			file=new FileManager(File.OpenRead(openFileDialog1.FileName),dataMan);
+//			file
 		}
 	}
 }
