@@ -99,7 +99,7 @@ namespace XPCTViewer
 		private void updateTimer_Tick(object sender, EventArgs e)
 		{
 			for (int i = 0; i < Raw2Image.NumDetectorModules; i++)
-				i2b.FillBufferData(dataMan.PeekMostRecentImage(i + 1), i);
+				i2b.SetBufferAtPos(dataMan.PeekMostRecentImage(i + 1), i);
 			picBox.Invalidate();
 
 			maxLbl.Text = string.Format("最大值{0}/0x{0:X}", i2b.DataMax);
@@ -128,7 +128,7 @@ namespace XPCTViewer
 					}
 					file?.Dispose();
 					file = new FileManager(File.Create(saveFileDialog1.FileName), dataMan);
-					file.WriteHeader();
+					file.BeginWrite();
 				}
 				openfileBtn.Enabled = false;
 				acqGrp.Enabled = false;
@@ -265,11 +265,25 @@ namespace XPCTViewer
 		{
 			if (openFileDialog1.ShowDialog() != DialogResult.OK)
 				return;
-			frameScrl.Value = 0;
 			file?.Dispose();
-			dataMan.Clear();
 			file=new FileManager(File.OpenRead(openFileDialog1.FileName),dataMan);
-//			file
+			if (!file.BeginRead())
+			{
+				MessageBox.Show("文件格式不正确");
+				file.Dispose();
+				file = null;
+				return;
+			}
+			int pos=file.LoadFileSegmentAtPos(0);
+			for (int i = 0; i < 5; i++)
+			{
+				int temp;
+				i2b.SetBufferAtPos(dataMan.PeekImageAt(i, out temp), i);
+			}
+			picBox.Invalidate();
+			frameScrl.Value = 0;
+			nFramesLbl.Text = $"共{file.NumFrames}帧图像:第1-5帧";
 		}
+
 	}
 }

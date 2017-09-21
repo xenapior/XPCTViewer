@@ -8,17 +8,20 @@ namespace PCTImageAcquisition
 {
 	public class FileManager : IDisposable
 	{
-		public int NumFrames;
+		public int NumFrames { get; private set; } // Number of frames in the file
+
+		private const int FileHeader = 16;
+		private const int FrameHeader = 4;
+		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
+		private const int pb = Raw2Image.PixelBytes;
+		private const int FrameLength = FrameHeader + ImageLength * pb;
 
 		private uint[] imageBuffer;
 		private int[] modIdBuffer;
 		private byte[] binform;
 		private FileStream fileStream;
 		private DataManager dataMan;
-		private const int ImageLength = Raw2Image.ImageCol * Raw2Image.ImageRow;
-		private const int pb = Raw2Image.PixelBytes;
-		private const int FrameLength = 4 + ImageLength * pb;
-		private int nFrames, lastGroup;
+		private int nFrames, segStartPos, segEndPos;
 
 		public FileManager(FileStream fStream, DataManager dataManager)
 		{
@@ -39,29 +42,31 @@ namespace PCTImageAcquisition
 			}
 		}
 
-		public void WriteHeader()
+		public void BeginWrite()
 		{
-			byte[] header = new byte[16];
+			byte[] header = new byte[FileHeader];
 			header[0] = 0x58;   //'X'
 			header[1] = 0x50;   //'P'
 			header[2] = 0x43;   //'C'
 			header[3] = 0x54;   //'T'
 			header[8] = 0x84;
 			header[9] = 0x4;    // 0x484 = 1156 is the FrameLength
-			fileStream.Write(header, 0, 16);
+			fileStream.Write(header, 0, FileHeader);
+			nFrames = 0;
+			dataMan.Clear();
 		}
 
-		public bool ReadHeader()
+		public bool BeginRead()
 		{
-			byte[] header = new byte[16];
-			fileStream.Read(header, 0, 16);
+			byte[] header = new byte[FileHeader];
+			fileStream.Read(header, 0, FileHeader);
 			byte[] XPCT = { 0x58, 0x50, 0x43, 0x54 };
 			for (int i = 0; i < 4; i++)
-			{
 				if (header[i] != XPCT[i])
 					return false;
-			}
 			NumFrames = BitConverter.ToInt32(header, 4);
+			segEndPos = -1; // trigger Loading file
+			dataMan.Clear();
 			return true;
 		}
 
@@ -72,12 +77,12 @@ namespace PCTImageAcquisition
 			for (int i = 0; i < dataMan.Length; i++)
 			{
 				int frameStart = i * FrameLength;
-				binform[frameStart] = (byte)dataMan.ModID[i];
+				binform[frameStart] = (byte)dataMan.ModID[i];   //only the 1st byte used, among 4 bytes
 				for (int j = 0; j < ImageLength; j++)
 				{
 					uint pxInt = dataMan.Data[i * ImageLength + j];
-					int sub = 4 + frameStart + j * pb;
-					binform[sub] = (byte)(pxInt >> 16);
+					int sub = FrameHeader + frameStart + j * pb;
+					binform[sub] = (byte)(pxInt >> 16);     //Big-endian
 					binform[sub + 1] = (byte)(pxInt >> 8);
 					binform[sub + 2] = (byte)pxInt;
 				}
@@ -104,7 +109,7 @@ namespace PCTImageAcquisition
 						for (int j = 0; j < ImageLength; j++)
 						{
 							uint pxInt = dataMan.Data[i * ImageLength + j];
-							byte* sub = pbinform + 4 + frameStart + j * pb;
+							byte* sub = pbinform + FrameHeader + frameStart + j * pb;
 							*(sub) = (byte)(pxInt >> 16);
 							*(sub + 1) = (byte)(pxInt >> 8);
 							*(sub + 2) = (byte)pxInt;
@@ -118,17 +123,43 @@ namespace PCTImageAcquisition
 		}
 
 		/// <summary>
-		/// Load into DataManager the frames around position
+		/// Load into DataManager the frames around pos.
+		/// If the segment of data were already loaded, returns the relative position.
 		/// </summary>
-		/// <param name="position"></param>
+		/// <param name="pos"> the pa</param>
 		/// <returns>0-based location of position in the DataManager. -1 for error</returns>
-		public int LoadFileSegmentAtPos(int position)
+		public int LoadFileSegmentAtPos(int pos)
 		{
-			if (position >= NumFrames)
+			if (pos >= NumFrames)
 				return -1;
+			if (pos >= segStartPos && pos <= segEndPos - Raw2Image.NumDetectorModules)
+				return pos - segStartPos;
+			if (pos >= NumFrames - Raw2Image.NumDetectorModules && dataMan.Length != 0) // for the last 5 frames
+				return pos - segStartPos;
+			segStartPos = pos - dataMan.FrameCapacity / 2;
+			segStartPos = segStartPos > 0 ? segStartPos : 0;
+			segEndPos = pos + (dataMan.FrameCapacity - 1) / 2;
+			segEndPos = segEndPos < NumFrames ? segEndPos : NumFrames - 1;
 
-			int 
+			fileStream.Seek(FileHeader + (long)segStartPos * FrameLength, SeekOrigin.Begin);
+			fileStream.Read(binform, 0, binform.Length);
+			for (int i = 0; i < segEndPos - segStartPos; i++)
+			{
+				modIdBuffer[i] = binform[FrameLength * i];    //only read the 1st byte as modId
+				int frameDataStart = FrameLength * i + FrameHeader;
+				for (int j = 0; j < ImageLength; j++)
+				{
+					int p = frameDataStart + j * pb;
+					uint hi = binform[p];       // big-endian
+					uint mid = binform[p + 1];
+					uint low = binform[p + 2];
+					imageBuffer[ImageLength * i + j] = (hi << 16) + (mid << 8) + low;
+				}
+			}
+			imageBuffer.CopyTo(dataMan.Data, 0);
+			modIdBuffer.CopyTo(dataMan.ModID, 0);
+			dataMan.Length = segEndPos - segStartPos + 1;
+			return pos - segStartPos;
 		}
 	}
-
 }

@@ -37,7 +37,7 @@
 			this.minLbl = new System.Windows.Forms.Label();
 			this.pixelDataLbl = new System.Windows.Forms.Label();
 			this.maxLbl = new System.Windows.Forms.Label();
-			this.nGroupsLbl = new System.Windows.Forms.Label();
+			this.nFramesLbl = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.updateIntevalBox = new System.Windows.Forms.TextBox();
 			this.magBar = new System.Windows.Forms.TrackBar();
@@ -102,7 +102,7 @@
 			this.datapropGrp.Controls.Add(this.minLbl);
 			this.datapropGrp.Controls.Add(this.pixelDataLbl);
 			this.datapropGrp.Controls.Add(this.maxLbl);
-			this.datapropGrp.Controls.Add(this.nGroupsLbl);
+			this.datapropGrp.Controls.Add(this.nFramesLbl);
 			this.datapropGrp.Location = new System.Drawing.Point(12, 195);
 			this.datapropGrp.Name = "datapropGrp";
 			this.datapropGrp.Size = new System.Drawing.Size(258, 163);
@@ -137,14 +137,14 @@
 			this.maxLbl.TabIndex = 17;
 			this.maxLbl.Text = "最大值1/0x1";
 			// 
-			// nGroupsLbl
+			// nFramesLbl
 			// 
-			this.nGroupsLbl.AutoSize = true;
-			this.nGroupsLbl.Location = new System.Drawing.Point(13, 25);
-			this.nGroupsLbl.Name = "nGroupsLbl";
-			this.nGroupsLbl.Size = new System.Drawing.Size(59, 12);
-			this.nGroupsLbl.TabIndex = 14;
-			this.nGroupsLbl.Text = "共0帧数据";
+			this.nFramesLbl.AutoSize = true;
+			this.nFramesLbl.Location = new System.Drawing.Point(13, 25);
+			this.nFramesLbl.Name = "nFramesLbl";
+			this.nFramesLbl.Size = new System.Drawing.Size(59, 12);
+			this.nFramesLbl.TabIndex = 14;
+			this.nFramesLbl.Text = "共0帧数据";
 			// 
 			// label2
 			// 
@@ -296,7 +296,7 @@
 			// netCaptureBtn
 			// 
 			this.netCaptureBtn.Appearance = System.Windows.Forms.Appearance.Button;
-			this.netCaptureBtn.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+			this.netCaptureBtn.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
 			this.netCaptureBtn.ForeColor = System.Drawing.SystemColors.ControlText;
 			this.netCaptureBtn.Location = new System.Drawing.Point(500, 364);
 			this.netCaptureBtn.Name = "netCaptureBtn";
@@ -457,7 +457,7 @@
 		private System.Windows.Forms.Label magDisp;
         private System.Windows.Forms.CheckBox isGrayscaling;
 		private System.Windows.Forms.HScrollBar frameScrl;
-		private System.Windows.Forms.Label nGroupsLbl;
+		private System.Windows.Forms.Label nFramesLbl;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox updateIntevalBox;
 		private System.Windows.Forms.Label pixelDataLbl;

@@ -18,6 +18,8 @@ namespace XPCTViewer
 		public readonly uint[][] BufferInts;
 		public uint DataMax, DataMin;
 
+		private const int ImageLength = Raw2Image.ImageRow*Raw2Image.ImageCol;
+
 		public Image2Bmp()
 		{
 			BmpImages = new Bitmap[Raw2Image.NumDetectorModules];
@@ -35,9 +37,9 @@ namespace XPCTViewer
 		/// </summary>
 		/// <param name="imageInts">Source data in int32</param>
 		/// <param name="position">0-based position of the bitmap</param>
-		public void FillBufferData(uint[] imageInts, int position)
+		public void SetBufferAtPos(uint[] imageInts, int position)
 		{
-			imageInts.CopyTo(BufferInts[position], 0);
+			BufferInts[position] = imageInts;
 		}
 
 		private void UpdateBitmap(uint[] imageInts, int position)

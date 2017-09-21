@@ -31,6 +31,7 @@ namespace PCTImageAcquisition
 			if (capturer.IsRunning)
 				return false;
 			dataManager = dataMan;
+			dataManager.Clear();
 			capturer.StartAcquisitionAsync(cbFillDataManager);
 
 			return true;

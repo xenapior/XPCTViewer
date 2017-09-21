@@ -31,7 +31,7 @@ namespace PCTImageAcquisition
 		private readonly uint[] blackImage;  // accelerate data peeking
 		private Action callbackBufferfull;	// triggers when buffer is full
 
-		public DataManager(int frameCapacity = 500)
+		public DataManager(int frameCapacity = 1000)
 		{
 			_frameCapacity = frameCapacity;
 			Data = new uint[frameCapacity * ImageLength];
@@ -83,5 +83,12 @@ namespace PCTImageAcquisition
 			return im;
 		}
 
+		public uint[] PeekImageAt(int index, out int modId)
+		{
+			uint[] im = new uint[ImageLength];
+			Array.Copy(Data, index * ImageLength, im, 0, ImageLength);
+			modId = ModID[index];
+			return im;
+		}
 	}
 }
